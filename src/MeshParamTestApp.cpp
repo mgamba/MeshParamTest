@@ -101,15 +101,15 @@ void MeshParamTestApp::updateNoise()
 void MeshParamTestApp::setupShader()
 {
     // setup shader
-//    try {
-//        mGlsl = gl::GlslProg::create( gl::GlslProg::Format().vertex( loadAsset( "basic.vert" ) )
-//                                     .fragment( loadAsset( "basic.frag" ) )
-//                                     .geometry( loadAsset( "basic.geom" ) ) );
-//    }
-//    catch( gl::GlslProgCompileExc ex ) {
-//        cout << ex.what() << endl;
-//        quit();
-//    }
+    try {
+        mGlsl = gl::GlslProg::create( gl::GlslProg::Format().vertex( loadAsset( "basic.vert" ) )
+                                     .fragment( loadAsset( "basic.frag" ) )
+                                     .geometry( loadAsset( "basic.geom" ) ) );
+    }
+    catch( gl::GlslProgCompileExc ex ) {
+        cout << ex.what() << endl;
+        quit();
+    }
 }
 
 void MeshParamTestApp::setupPlane()
