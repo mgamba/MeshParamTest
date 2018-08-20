@@ -2,7 +2,6 @@
 
 uniform sampler2D    tex0;
 uniform vec2        sample_offset;
-uniform float        attenuation;
 
 in vec2 vTexCoord0;
 
@@ -10,6 +9,7 @@ out vec4 oColor;
 
 void main()
 {
+//    vec3 startColor = vec3( 0.0, 1.0, 0.0 );
     vec3 sum = vec3( 0.0, 0.0, 0.0 );
     sum += texture( tex0, vTexCoord0 + -10.0 * sample_offset ).rgb * 0.009167927656011385;
     sum += texture( tex0, vTexCoord0 +  -9.0 * sample_offset ).rgb * 0.014053461291849008;
@@ -33,6 +33,7 @@ void main()
     sum += texture( tex0, vTexCoord0 +  +9.0 * sample_offset ).rgb * 0.014053461291849008;
     sum += texture( tex0, vTexCoord0 + +10.0 * sample_offset ).rgb * 0.009167927656011385;
     
-    oColor.rgb = attenuation * sum;
+    oColor.rgb = sum;
     oColor.a = 1.0;
+//    oColor.rgb = vec3( 0.0, 1.0, 0.0 );
 }

@@ -68,6 +68,7 @@ private:
 //    gl::GlslProg            mShader;
     int                     mTerrainOffset;
     double                  m_fLastTime;
+    gl::GlslProgRef         mWireframeShader;
 };
 
 void MeshParamTestApp::setPlaneSubdivisions( int subdivisions)
@@ -113,6 +114,10 @@ void MeshParamTestApp::setupShader()
     try {
         mGlsl = gl::GlslProg::create( gl::GlslProg::Format().vertex( loadAsset( "blur.vert" ) )
                                      .fragment( loadAsset( "blur.frag" ) ));
+        
+        mWireframeShader = gl::GlslProg::create(loadAsset("wireframe.vert"),
+                                                loadAsset("wireframe.frag"),
+                                                loadAsset("wireframe.geom"));
     }
     catch( gl::GlslProgCompileExc ex ) {
         cout << ex.what() << endl;
@@ -263,21 +268,37 @@ void MeshParamTestApp::draw()
     // Draw the interface
     mParams->draw();
     
-    gl::bindStockShader(gl::ShaderDef().color());
-    gl::color(0, 1, 0);
     
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
+    gl::ScopedGlslProg glslScope( gl::getStockShader( gl::ShaderDef().texture() ) );
+    
+    gl::ScopedGlslProg shader( mWireframeShader );
+    
+    mBatch = gl::Batch::create( mVboMesh, mWireframeShader );
+    mBatch->draw();
+    
+    
+    
+    
+    
+    
+//    gl::bindStockShader(gl::ShaderDef().color());
+//    gl::color(0, 1, 0);
+    
+//    gl::ScopedGlslProg shader( mGlsl );
+    
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
 //    mShader.bind();
-    gl::draw( mVboMesh );
+//    gl::draw( mVboMesh );
 //    mShader.unbind();
     
     
     
-//    gl::ScopedGlslProg shader( mGlsl );
+    
 //
 //
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 //    mBatch = gl::Batch::create( mVboMesh, mGlsl );
 //    mBatch->draw();
     
