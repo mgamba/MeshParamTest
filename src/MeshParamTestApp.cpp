@@ -21,8 +21,8 @@ void prepareSettings( App::Settings *settings )
     settings->setMultiTouchEnabled( false );
 }
 
-enum HeightFunction { sine, uniform, randnoise, fractal, noise };
-const vector<string> heightFunctionNames = { "sine", "uniform", "randnoise", "fractal", "noise" };
+enum HeightFunction { sine, uniform, randnoise, fractal, simplex };
+const vector<string> heightFunctionNames = { "sine", "uniform", "randnoise", "fractal", "simplex" };
 
 class MeshParamTestApp : public App {
 public:
@@ -161,7 +161,7 @@ void MeshParamTestApp::udpatePlaneHeights()
             case fractal:
                 mappedPosAttrib->y = mHeightMult * mNoise.fractal(mOctaves, pos.x, pos.z);
                 break;
-            case noise:
+            case simplex:
                 mappedPosAttrib->y = mHeightMult * mNoise.noise(pos.x, pos.z);
                 break;
             default:
@@ -213,7 +213,7 @@ void MeshParamTestApp::setupParams()
     mParams->addParam( "Height Function", heightFunctionNames, &mSelectedHeightFunction )
     .updateFn( [this] { mHeightFunction = HeightFunction(mSelectedHeightFunction); } );
     
-    mParams->addParam("Octaves", &mOctaves).min(1).max(20).group("Noise Params").updateFn( [this] { console() << "new mOctaves value: " << mOctaves << endl; } );
+    mParams->addParam("Octaves", &mOctaves).min(1).max(20).group("Simplex Params").updateFn( [this] { console() << "new mOctaves value: " << mOctaves << endl; } );
     
     mParams->addParam("Height Multiplier", &mHeightMult ).group("Mesh Params");
     
