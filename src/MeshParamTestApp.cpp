@@ -83,6 +83,7 @@ void MeshParamTestApp::setup()
     mHeightFunction = fractal;
     mSelectedHeightFunction = fractal;
     setupParams();
+    updateNoise();
     setupShader();
     setupPlane();
     udpatePlaneHeights();
@@ -183,18 +184,18 @@ void MeshParamTestApp::setupParams()
     mObjSize = 4;
     
     // mesh params
-    mPlaneSize = 20;
-    mPlaneSubdivisions = 50;
-    mHeightMult = 1.0;
+    mPlaneSize = 26;
+    mPlaneSubdivisions = 54;
+    mHeightMult = 3.90;
     
     // fractal params
-    mOctaves = 2;
+    mOctaves = 7;
     
     // noise params
-    mNoiseFrequency = 1.0f; // Frequency of an octave of noise is the "width" of the pattern
-    mNoiseAmplitude = 1.0f; // Amplitude of an octave of noise it the "height" of its feature
-    mNoiseLacunarity = 2.0f; // Lacunarity specifies frequency multipler between successive octaves (typically 2.0)
-    mNoisePersistence = 0.5f; // Persistence is loss of amplitude between successive octabes (usually 1/lacunarity)
+    mNoiseFrequency = 2.08f; // Frequency of an octave of noise is the "width" of the pattern
+    mNoiseAmplitude = 0.64f; // Amplitude of an octave of noise it the "height" of its feature
+    mNoiseLacunarity = 0.65f; // Lacunarity specifies frequency multipler between successive octaves (typically 2.0)
+    mNoisePersistence = 1.4f; // Persistence is loss of amplitude between successive octabes (usually 1/lacunarity)
     
     // Create the interface and give it a name.
     mParams = params::InterfaceGl::create( getWindow(), "App parameters", toPixels( ivec2( 200, 400 ) ) );
