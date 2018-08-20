@@ -64,6 +64,10 @@ private:
     vec3                    mCameraEyePoint;
     vec3                    mCameraTarget;
     float                   mHeightMult;
+    gl::BatchRef            mBatch;
+//    gl::GlslProg            mShader;
+    int                     mTerrainOffset;
+    double                  m_fLastTime;
 };
 
 void MeshParamTestApp::setPlaneSubdivisions( int subdivisions)
@@ -80,8 +84,12 @@ void MeshParamTestApp::setPlaneSize( int size)
 
 void MeshParamTestApp::setup()
 {
+    m_fLastTime = cinder::app::getElapsedSeconds();
+    
     mHeightFunction = fractal;
     mSelectedHeightFunction = fractal;
+    mTerrainOffset = 0;
+    
     setupParams();
     updateNoise();
     setupShader();
@@ -103,9 +111,8 @@ void MeshParamTestApp::setupShader()
 {
     // setup shader
     try {
-        mGlsl = gl::GlslProg::create( gl::GlslProg::Format().vertex( loadAsset( "basic.vert" ) )
-                                     .fragment( loadAsset( "basic.frag" ) )
-                                     .geometry( loadAsset( "basic.geom" ) ) );
+        mGlsl = gl::GlslProg::create( gl::GlslProg::Format().vertex( loadAsset( "blur.vert" ) )
+                                     .fragment( loadAsset( "blur.frag" ) ));
     }
     catch( gl::GlslProgCompileExc ex ) {
         cout << ex.what() << endl;
@@ -136,11 +143,17 @@ void MeshParamTestApp::updatePlaneDimensions()
     };
     
     mVboMesh = gl::VboMesh::create( plane, bufferLayout );
+    mTerrainOffset = 0;
 }
 
 void MeshParamTestApp::udpatePlaneHeights()
 {
     float offset = getElapsedSeconds() * 4.0f;
+    
+    if (cinder::app::getElapsedSeconds() >= m_fLastTime + 0.3) {
+        m_fLastTime += 0.1;
+        mTerrainOffset += 1;
+    }
     
     // Dynmaically generate our new positions based on a sin(x) + cos(z) wave
     // We set 'orphanExisting' to false so that we can also read from the position buffer, though keep
@@ -160,10 +173,10 @@ void MeshParamTestApp::udpatePlaneHeights()
                 mappedPosAttrib->y = Rand::randFloat(1);
                 break;
             case fractal:
-                mappedPosAttrib->y = mHeightMult * mNoise.fractal(mOctaves, pos.x, pos.z);
+                mappedPosAttrib->y = mHeightMult * mNoise.fractal(mOctaves, pos.x, pos.z + mTerrainOffset);
                 break;
             case simplex:
-                mappedPosAttrib->y = mHeightMult * mNoise.noise(pos.x, pos.z);
+                mappedPosAttrib->y = mHeightMult * mNoise.noise(pos.x, pos.z + mTerrainOffset);
                 break;
             default:
                 break;
@@ -177,11 +190,9 @@ void MeshParamTestApp::udpatePlaneHeights()
 void MeshParamTestApp::setupParams()
 {
     // camera params
-    mCameraEyePoint = vec3( 20.41, 30.3, 30.93 );
-    mCameraTarget = vec3( 2.41, 3.81, 5.68 );
-    
-    // cube params
-    mObjSize = 4;
+    mCameraEyePoint = vec3( 23.84, 22.67, 34.78 );
+    mCameraTarget = vec3( 3.09, 4.70, 4.58 );
+    mObjOrientation = quat(-0.309,   -0.016,    0.949,   -0.061);
     
     // mesh params
     mPlaneSize = 26;
@@ -200,14 +211,9 @@ void MeshParamTestApp::setupParams()
     // Create the interface and give it a name.
     mParams = params::InterfaceGl::create( getWindow(), "App parameters", toPixels( ivec2( 200, 400 ) ) );
     
-    mParams->addParam( "Rotation", &mObjOrientation ).group("Camera Params");
+    mParams->addParam( "Rotation", &mObjOrientation ).group("Camera Params").updateFn( [this] { console() << "mObjOrientation: " << mObjOrientation << endl; } );
     mParams->addParam( "Camera EyePoint", &mCameraEyePoint ).group("Camera Params");
     mParams->addParam( "Camera Target", &mCameraTarget ).group("Camera Params");
-    
-    // Setup some basic parameters.
-    mParams->addParam( "Cube Size", &mObjSize ).min( 0.1f ).max( 20.5f ).keyIncr( "z" ).keyDecr( "Z" ).precision( 2 ).step( 0.02f );
-    
-    mParams->addSeparator();
     
     mParams->addParam( "Height Function", heightFunctionNames, &mSelectedHeightFunction )
     .updateFn( [this] { mHeightFunction = HeightFunction(mSelectedHeightFunction); } );
@@ -253,9 +259,6 @@ void MeshParamTestApp::draw()
     gl::setMatrices( mCamera );
     mCamera.lookAt(mCameraEyePoint, mCameraTarget);
     gl::rotate( mObjOrientation );
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    gl::drawCube( vec3( 0 ), vec3( mObjSize ) );
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
     // Draw the interface
     mParams->draw();
@@ -264,8 +267,20 @@ void MeshParamTestApp::draw()
     gl::color(0, 1, 0);
     
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
+//    mShader.bind();
     gl::draw( mVboMesh );
+//    mShader.unbind();
+    
+    
+    
+//    gl::ScopedGlslProg shader( mGlsl );
+//
+//
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//    mBatch = gl::Batch::create( mVboMesh, mGlsl );
+//    mBatch->draw();
+    
 }
 
 CINDER_APP( MeshParamTestApp, RendererGl, prepareSettings )
