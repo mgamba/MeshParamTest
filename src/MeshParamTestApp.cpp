@@ -215,7 +215,7 @@ void MeshParamTestApp::setupParams()
     
     mParams->addParam("Octaves", &mOctaves).min(1).max(20).group("Simplex Params").updateFn( [this] { console() << "new mOctaves value: " << mOctaves << endl; } );
     
-    mParams->addParam("Height Multiplier", &mHeightMult ).group("Mesh Params");
+    mParams->addParam("Height Multiplier", &mHeightMult ).precision( 2 ).step( 0.02f ).group("Mesh Params");
     
     function<void( int )> planeSizeSetter = bind(&MeshParamTestApp::setPlaneSize, this, placeholders::_1);
     function<int ()> planeSizeGetter = bind(&MeshParamTestApp::getPlaneSize, this);
@@ -225,10 +225,10 @@ void MeshParamTestApp::setupParams()
     function<int ()> planeSubdivisionsGetter = bind( &MeshParamTestApp::getPlaneSubdivisions, this );
     mParams->addParam( "Plane Subdivisions", planeSubdivisionsSetter, planeSubdivisionsGetter ).group("Mesh Params");
     
-    mParams->addParam("Frequency", &mNoiseFrequency).min(0.1f).max(20.0f).group("Fractal Params").updateFn([this]{updateNoise();});
-    mParams->addParam("Amplitude", &mNoiseAmplitude).min(0.1f).max(20.0f).group("Fractal Params").updateFn([this]{updateNoise();});
-    mParams->addParam("Lacunarity", &mNoiseLacunarity).min(0.1f).max(20.0f).group("Fractal Params").updateFn([this]{updateNoise();});
-    mParams->addParam("Persistence", &mNoisePersistence).min(0.1f).max(20.0f).group("Fractal Params").updateFn([this]{updateNoise();});
+    mParams->addParam("Frequency", &mNoiseFrequency).min(0.1f).max(20.0f).precision(2).step(0.02f).group("Fractal Params").updateFn([this]{updateNoise();});
+    mParams->addParam("Amplitude", &mNoiseAmplitude).min(0.1f).max(20.0f).precision(2).step(0.02f).group("Fractal Params").updateFn([this]{updateNoise();});
+    mParams->addParam("Lacunarity", &mNoiseLacunarity).min(0.1f).max(20.0f).precision(2).step(0.01f).group("Fractal Params").updateFn([this]{updateNoise();});
+    mParams->addParam("Persistence", &mNoisePersistence).min(0.1f).max(20.0f).precision(1).step(0.1f).group("Fractal Params").updateFn([this]{updateNoise();});
 }
 
 void MeshParamTestApp::resize()
@@ -259,8 +259,8 @@ void MeshParamTestApp::draw()
     // Draw the interface
     mParams->draw();
     
-    gl::ScopedGlslProg glslScope( gl::getStockShader( gl::ShaderDef().texture() ) );
-    gl::ScopedTextureBind texScope( mTexture );
+    gl::bindStockShader(gl::ShaderDef().color());
+    gl::color(0, 1, 0);
     
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     gl::draw( mVboMesh );
