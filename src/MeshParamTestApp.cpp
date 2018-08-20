@@ -44,7 +44,7 @@ private:
     void                    setupPlane();
     void                    udpatePlaneHeights();
     void                    setupShader();
-    gl::GlslProgRef         mGlsl;
+    gl::GlslProgRef         mBlurShader;
     void                    updateNoise();
     SimplexNoise            mNoise;
     float                   mNoiseFrequency;
@@ -112,7 +112,7 @@ void MeshParamTestApp::setupShader()
 {
     // setup shader
     try {
-        mGlsl = gl::GlslProg::create( gl::GlslProg::Format().vertex( loadAsset( "blur.vert" ) )
+        mBlurShader = gl::GlslProg::create( gl::GlslProg::Format().vertex( loadAsset( "blur.vert" ) )
                                      .fragment( loadAsset( "blur.frag" ) ));
         
         mWireframeShader = gl::GlslProg::create(loadAsset("wireframe.vert"),
@@ -285,7 +285,7 @@ void MeshParamTestApp::draw()
 //    gl::bindStockShader(gl::ShaderDef().color());
 //    gl::color(0, 1, 0);
     
-//    gl::ScopedGlslProg shader( mGlsl );
+//    gl::ScopedGlslProg shader( mBlurShader );
     
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
@@ -299,7 +299,7 @@ void MeshParamTestApp::draw()
 //
 //
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//    mBatch = gl::Batch::create( mVboMesh, mGlsl );
+//    mBatch = gl::Batch::create( mVboMesh, mBlurShader );
 //    mBatch->draw();
     
 }
